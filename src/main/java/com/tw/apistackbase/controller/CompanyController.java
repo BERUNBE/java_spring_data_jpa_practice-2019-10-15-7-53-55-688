@@ -3,6 +3,8 @@ package com.tw.apistackbase.controller;
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -16,32 +18,42 @@ public class CompanyController {
     private CompanyRepository repository;
 
     @GetMapping(produces = {"application/json"})
+    @ResponseStatus(value = HttpStatus.OK)
     public List<Company> getAllCompanies() {
         return repository.findAll();
     }
 
     @GetMapping(path = "/{name}", produces = {"application/json"})
+    @ResponseStatus(value = HttpStatus.OK)
     public Company getCompanyByName(@PathVariable String name) {
         return repository.findOneByName(name);
     }
 
     @PostMapping(produces = {"application/json"})
+    @ResponseStatus(value = HttpStatus.CREATED)
     public Company addCompany(@RequestBody Company company) {
         return repository.save(company);
     }
 
     @PutMapping(path = "/{name}", produces = {"application/json"})
-    public Company updateCompanyByName(@PathVariable String name, @RequestBody Company updatedCompany) {
+    public ResponseEntity<Company> updateCompanyByName(@PathVariable String name, @RequestBody Company updatedCompany) {
         Company company = repository.findOneByName(name);
+        if (company == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         company.setName(updatedCompany.getName());
         company.setProfile(updatedCompany.getProfile());
         company.setEmployees(updatedCompany.getEmployees());
-        return repository.save(company);
+        return new ResponseEntity<>(company, HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{name}", produces = {"application/json"})
-    public List<Company> deleteCompanyByName(@PathVariable String name) {
+    public ResponseEntity<Company> deleteCompanyByName(@PathVariable String name) {
+        Company company = repository.findOneByName(name);
+        if (company == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         repository.deleteByName(name);
-        return repository.findAll();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
