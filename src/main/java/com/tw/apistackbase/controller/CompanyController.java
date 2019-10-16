@@ -16,6 +16,11 @@ public class CompanyController {
         return repository.findAll();
     }
 
+    @GetMapping(path = "/{name}", produces = {"application/json"})
+    public Company getCompanyByName(@PathVariable String name) {
+        return repository.findOneByName(name);
+    }
+
     @PostMapping(produces = {"application/json"})
     public Company add(@RequestBody Company company) {
         return repository.save(company);
