@@ -25,4 +25,13 @@ public class CompanyController {
     public Company add(@RequestBody Company company) {
         return repository.save(company);
     }
+
+    @PutMapping(path = "/{name}", produces = {"application/json"})
+    public Company updateCompany(@PathVariable String name, @RequestBody Company updatedCompany) {
+        Company company = repository.findOneByName(name);
+        company.setName(updatedCompany.getName());
+        company.setProfile(updatedCompany.getProfile());
+        company.setEmployees(updatedCompany.getEmployees());
+        return repository.save(company);
+    }
 }
