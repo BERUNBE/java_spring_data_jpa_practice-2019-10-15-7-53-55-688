@@ -12,7 +12,7 @@ public class Company {
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private CompanyProfile companyProfile;
+    private CompanyProfile profile;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Employee> employees;
@@ -40,12 +40,12 @@ public class Company {
         this.name = name;
     }
 
-    public CompanyProfile getCompanyProfile() {
-        return companyProfile;
+    public CompanyProfile getProfile() {
+        return profile;
     }
 
-    public void setCompanyProfile(CompanyProfile companyProfile) {
-        this.companyProfile = companyProfile;
+    public void setProfile(CompanyProfile profile) {
+        this.profile = profile;
     }
 
     public List<Employee> getEmployees() {
