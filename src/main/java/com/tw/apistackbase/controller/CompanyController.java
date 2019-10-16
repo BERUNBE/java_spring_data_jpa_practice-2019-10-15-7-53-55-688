@@ -18,6 +18,6 @@ public class CompanyController {
 
     @PostMapping(produces = {"application/json"})
     public Company add(@RequestBody Company company) {
-        return null;
+        return repository.save(company);
     }
 }
