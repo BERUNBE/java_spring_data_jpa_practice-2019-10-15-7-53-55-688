@@ -1,5 +1,7 @@
 package com.tw.apistackbase.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.core.CompanyProfile;
 import com.tw.apistackbase.core.Employee;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -17,7 +20,9 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +63,18 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$[1].name").value("companyB"));
     }
 
+    @Test
+    void should_add_a_company() throws Exception {
+        Company company1 = createCompany(1L, "companyA", null, Collections.emptyList());
+
+        ResultActions result = mvc.perform(post("/companies")
+                .contentType(APPLICATION_JSON)
+                .content(mapToJson(company1)));
+
+        result.andExpect(status().isCreated());
+    }
+    
+
     private Company createCompany(Long id, String name, CompanyProfile companyProfile, List<Employee> employees) {
         Company company = new Company();
         company.setId(id);
@@ -65,5 +82,9 @@ public class CompanyControllerTest {
         company.setProfile(companyProfile);
         company.setEmployees(employees);
         return company;
+    }
+
+    public String mapToJson(Object obj) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(obj);
     }
 }
