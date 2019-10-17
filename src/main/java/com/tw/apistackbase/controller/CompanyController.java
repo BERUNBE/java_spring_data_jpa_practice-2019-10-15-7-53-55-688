@@ -18,15 +18,11 @@ public class CompanyController {
     private CompanyRepository repository;
 
     @GetMapping(produces = {"application/json"})
-    @ResponseStatus(value = HttpStatus.OK)
-    public List<Company> getAllCompanies() {
-        return repository.findAll();
-    }
-
-    @GetMapping(path = "/{name}", produces = {"application/json"})
-    @ResponseStatus(value = HttpStatus.OK)
-    public Company getCompanyByName(@PathVariable String name) {
-        return repository.findOneByName(name);
+    public List<Company> getCompanyByName(@RequestParam(required = false) String name) {
+        if (name == null) {
+            return repository.findAll();
+        }
+        return repository.findAllByNameLike(name);
     }
 
     @PostMapping(produces = {"application/json"})
