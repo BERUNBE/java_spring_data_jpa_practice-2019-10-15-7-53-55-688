@@ -15,8 +15,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CompanyController.class)
@@ -38,7 +40,22 @@ public class CompanyControllerTest {
 
         ResultActions result = mvc.perform(get("/companies/?name=companyA"));
 
-        result.andExpect(status().isOk());
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("companyA"));
+    }
+
+    @Test
+    void should_return_all_companies() throws Exception {
+        Company company1 = createCompany(1L, "companyA", null, Collections.emptyList());
+        Company company2 = createCompany(2L, "companyB", null, Collections.emptyList());
+        when(companyService.findAll(PAGE, PAGE_SIZE)).thenReturn(Arrays.asList(company1, company2));
+
+        ResultActions result = mvc.perform(get("/companies/all"));
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name").value("companyA"))
+                .andExpect(jsonPath("$[1].name").value("companyB"));
     }
 
     private Company createCompany(Long id, String name, CompanyProfile companyProfile, List<Employee> employees) {
