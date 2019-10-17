@@ -21,8 +21,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,6 +71,32 @@ public class CompanyControllerTest {
                 .content(mapToJson(company1)));
 
         result.andExpect(status().isCreated());
+    }
+
+    @Test
+    void should_update_a_company_info() throws Exception {
+        Company oldCompany = createCompany(1L, "companyA", null, Collections.emptyList());
+        Company newCompany = createCompany(1L, "companyAa", null, Collections.emptyList());
+
+        when(companyService.findOneByName("companyA")).thenReturn(oldCompany);
+        ResultActions result = mvc.perform(put("/companies/companyA")
+                .contentType(APPLICATION_JSON)
+                .content(mapToJson(newCompany)));
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("companyAa"));
+    }
+
+    @Test
+    void should_return_not_found_when_trying_to_update_a_company_that_doesnt_exist() throws Exception {
+        Company newCompany = createCompany(1L, "companyAa", null, Collections.emptyList());
+
+        when(companyService.findOneByName("companyA")).thenReturn(null);
+        ResultActions result = mvc.perform(put("/companies/companyA")
+                .contentType(APPLICATION_JSON)
+                .content(mapToJson(newCompany)));
+
+        result.andExpect(status().isNotFound());
     }
     
 
