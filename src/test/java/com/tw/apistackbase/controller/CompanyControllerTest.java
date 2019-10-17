@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -45,7 +44,7 @@ public class CompanyControllerTest {
         ResultActions result = mvc.perform(get("/companies/?name=companyA"));
 
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("companyA"));
+                .andExpect(jsonPath("$[0].name").value("companyA"));
     }
 
     @Test
@@ -98,7 +97,24 @@ public class CompanyControllerTest {
 
         result.andExpect(status().isNotFound());
     }
-    
+
+    @Test
+    void should_delete_existing_company() throws Exception {
+        Company company1 = createCompany(1L, "companyAa", null, Collections.emptyList());
+
+        when(companyService.findOneByName("companyA")).thenReturn(company1);
+        ResultActions result = mvc.perform(delete("/companies/companyA"));
+
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    void should_return_not_found_when_trying_to_delete_a_null_company() throws Exception {
+        when(companyService.findOneByName("companyA")).thenReturn(null);
+        ResultActions result = mvc.perform(delete("/companies/companyA"));
+
+        result.andExpect(status().isNotFound());
+    }
 
     private Company createCompany(Long id, String name, CompanyProfile companyProfile, List<Employee> employees) {
         Company company = new Company();
