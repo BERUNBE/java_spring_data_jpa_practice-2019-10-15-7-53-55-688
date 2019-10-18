@@ -35,23 +35,12 @@ public class CompanyController {
 
     @PutMapping(path = "/{name}", produces = {"application/json"})
     public ResponseEntity<Company> updateCompanyByName(@PathVariable String name, @RequestBody Company updatedCompany) {
-        Company company = companyService.findOneByName(name);
-        if (company == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        company.setName(updatedCompany.getName());
-        company.setProfile(updatedCompany.getProfile());
-        company.setEmployees(updatedCompany.getEmployees());
-        return new ResponseEntity<>(company, HttpStatus.OK);
+        return companyService.updateCompanyByName(name, updatedCompany);
+
     }
 
     @DeleteMapping(path = "/{name}", produces = {"application/json"})
     public ResponseEntity<Company> deleteCompanyByName(@PathVariable String name) {
-        Company company = companyService.findOneByName(name);
-        if (company == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        companyService.deleteByName(name);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return companyService.deleteCompanyByName(name);
     }
 }
