@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -65,11 +66,13 @@ public class CompanyControllerTest {
     void should_add_a_company() throws Exception {
         Company company1 = createCompany(1L, "companyA", null, Collections.emptyList());
 
+        when(companyService.save(any())).thenReturn(company1);
         ResultActions result = mvc.perform(post("/companies")
                 .contentType(APPLICATION_JSON)
                 .content(mapToJson(company1)));
 
-        result.andExpect(status().isCreated());
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("companyA"));
     }
 
     @Test
