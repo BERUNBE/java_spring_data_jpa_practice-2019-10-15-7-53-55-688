@@ -2,6 +2,7 @@ package com.tw.apistackbase.controller;
 
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.service.CompanyService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class CompanyController {
     }
 
     @PutMapping(path = "/{name}", produces = {"application/json"})
-    public ResponseEntity<Company> updateCompanyByName(@PathVariable String name, @RequestBody Company updatedCompany) {
+    public ResponseEntity<Company> updateCompanyByName(@PathVariable String name, @RequestBody Company updatedCompany) throws NotFoundException {
         return companyService.updateCompanyByName(name, updatedCompany);
 
     }

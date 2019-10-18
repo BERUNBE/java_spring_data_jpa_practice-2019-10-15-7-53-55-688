@@ -2,6 +2,7 @@ package com.tw.apistackbase.service;
 
 import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.repository.CompanyRepository;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -22,16 +23,17 @@ public class CompanyService {
         return companyRepository.findAll(PageRequest.of(page, pageSize));
     }
 
-    public ResponseEntity<Company> updateCompanyByName(String name, Company updatedCompany) {
+    public ResponseEntity<Company> updateCompanyByName(String name, Company updatedCompany) throws NotFoundException {
         Company company = companyRepository.findOneByName(name);
         if (company == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Not found");
         }
         company.setName(updatedCompany.getName());
         company.setProfile(updatedCompany.getProfile());
         company.setEmployees(updatedCompany.getEmployees());
         return new ResponseEntity<>(company, HttpStatus.OK);
     }
+
 
     public Company findOneByName(String name) {
         return companyRepository.findOneByName(name);

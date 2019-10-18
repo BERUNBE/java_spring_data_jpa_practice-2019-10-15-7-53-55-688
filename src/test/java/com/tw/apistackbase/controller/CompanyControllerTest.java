@@ -6,6 +6,7 @@ import com.tw.apistackbase.core.Company;
 import com.tw.apistackbase.core.CompanyProfile;
 import com.tw.apistackbase.core.Employee;
 import com.tw.apistackbase.service.CompanyService;
+import javassist.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,14 +15,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -82,24 +87,26 @@ public class CompanyControllerTest {
     void should_update_a_company_info() throws Exception {
         Company updatedCompany = createCompany(1L, "companyAa", null, Collections.emptyList());
 
-        when(companyService.updateCompanyByName("companyA", updatedCompany)).thenReturn(new ResponseEntity<>(updatedCompany, HttpStatus.OK));
+        when(companyService.updateCompanyByName(eq("companyA"), any())).thenReturn(new ResponseEntity<>(updatedCompany, HttpStatus.OK));
         ResultActions result = mvc.perform(put("/companies/companyA")
                 .contentType(APPLICATION_JSON)
                 .content(mapToJson(updatedCompany)));
 
-        result.andExpect(status().isOk());
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("companyAa"));
     }
 
     @Test
     void should_return_not_found_when_trying_to_update_a_company_that_doesnt_exist() throws Exception {
         Company newCompany = createCompany(1L, "companyAa", null, Collections.emptyList());
 
-        when(companyService.updateCompanyByName(eq("companyAa"), any())).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        doThrow(NotFoundException.class).when(companyService).updateCompanyByName(eq("companyAa"), any());
         ResultActions result = mvc.perform(put("/companies/companyAa")
                 .contentType(APPLICATION_JSON)
                 .content(mapToJson(newCompany)));
 
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404));
     }
 
     @Test
