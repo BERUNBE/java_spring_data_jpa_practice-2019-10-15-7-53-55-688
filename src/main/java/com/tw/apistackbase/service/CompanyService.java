@@ -43,10 +43,10 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    public ResponseEntity<Company> deleteCompanyByName(String name) {
+    public ResponseEntity<Company> deleteCompanyByName(String name) throws NotFoundException {
         Company company = companyRepository.findOneByName(name);
         if (company == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Not found");
         }
         companyRepository.deleteByName(name);
         return new ResponseEntity<>(HttpStatus.OK);

@@ -41,7 +41,7 @@ public class CompanyController {
     }
 
     @DeleteMapping(path = "/{name}", produces = {"application/json"})
-    public ResponseEntity<Company> deleteCompanyByName(@PathVariable String name) {
+    public ResponseEntity<Company> deleteCompanyByName(@PathVariable String name) throws NotFoundException {
         return companyService.deleteCompanyByName(name);
     }
 }

@@ -121,10 +121,11 @@ public class CompanyControllerTest {
 
     @Test
     void should_return_not_found_when_trying_to_delete_a_null_company() throws Exception {
-        when(companyService.deleteCompanyByName("companyA")).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        doThrow(NotFoundException.class).when(companyService).deleteCompanyByName("companyA");
         ResultActions result = mvc.perform(delete("/companies/companyA"));
 
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404));
     }
 
     private Company createCompany(Long id, String name, CompanyProfile companyProfile, List<Employee> employees) {
